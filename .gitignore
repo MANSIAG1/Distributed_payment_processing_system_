@@ -1,0 +1,22 @@
+# Ignore virtual environments
+venv1/
+.venv1/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs
+*.log
+*.json
+
+# IDE settings
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
