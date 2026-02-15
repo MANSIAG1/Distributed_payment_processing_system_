@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - PayChain{% endblock %}
+
+{% block page_title %}Distributed Payment Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-7">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-exchange-alt text-primary me-2"></i>
+                    Create Transaction
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col">
+                        <div class="p-4 rounded-3 bg-light text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-shield-alt fa-2x text-primary opacity-75"></i>
+                            </div>
+                            <h6 class="mb-1">Fault-Tolerant</h6>
+                            <p class="small text-muted mb-0">Automatic node failover</p>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="p-4 rounded-3 bg-light text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-sync fa-2x text-primary opacity-75"></i>
+                            </div>
+                            <h6 class="mb-1">Synchronized</h6>
+                            <p class="small text-muted mb-0">Vector clock consistency</p>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="p-4 rounded-3 bg-light text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-check-double fa-2x text-primary opacity-75"></i>
+                            </div>
+                            <h6 class="mb-1">Consensus</h6>
+                            <p class="small text-muted mb-0">Raft leader election</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form id="payment-form" method="POST">
+                    <div class="mb-4">
+                        <label for="user_id" class="form-label fw-semibold">Recipient ID</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-user text-primary"></i>
+                            </span>
+                            <input type="text" class="form-control form-control-lg" id="user_id" name="user_id" required
+                                   placeholder="Enter recipient ID">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="amount" class="form-label fw-semibold">Transaction Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-dollar-sign text-primary"></i>
+                            </span>
+                            <input type="number" class="form-control form-control-lg" id="amount" name="amount" 
+                                   step="0.01" min="0.01" required
+                                   placeholder="0.00">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg w-100 py-3">
+                        <i class="fas fa-paper-plane me-2"></i>
+                        Process Transaction
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-info-circle text-primary me-2"></i>
+                    System Overview
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-semibold">Consensus Protocol</div>
+                        <span class="badge bg-primary bg-opacity-10 text-primary">Raft</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 100%;"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-semibold">Time Synchronization</div>
+                        <span class="badge bg-primary bg-opacity-10 text-primary">Vector Clock</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 100%;"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-semibold">Replication Strategy</div>
+                        <span class="badge bg-primary bg-opacity-10 text-primary">Multi-node</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 100%;"></div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mb-0">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="fas fa-lightbulb fa-2x text-info"></i>
+                        </div>
+                        <div>
+                            <h6 class="alert-heading">How it works</h6>
+                            <p class="mb-0 small">This system demonstrates key distributed systems concepts including fault tolerance, consensus protocols, and clock synchronization.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Result Modal -->
+<div class="modal fade" id="resultModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header align-items-center">
+                <h5 class="modal-title">
+                    <i class="fas fa-receipt text-primary me-2"></i>
+                    Transaction Result
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="result-content"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="/history" class="btn btn-primary">
+                    <i class="fas fa-history me-1"></i>
+                    View All Transactions
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById("payment-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Disable button and show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Processing...';
+    
+    const formData = new FormData(this);
+    const userId = formData.get("user_id");
+    const amount = formData.get("amount");
+    
+    try {
+        // Send form data properly formatted for FastAPI endpoint which expects Form data
+        const response = await fetch("/process-payment", {
+            method: "POST",
+            body: formData  // FormData contains all form fields
+        });
+        
+        const result = await response.json();
+        
+        // Show result in modal
+        const resultModal = new bootstrap.Modal(document.getElementById("resultModal"));
+        const resultContent = document.getElementById("result-content");
+        
+        if (response.ok) {
+            // Success
+            resultContent.innerHTML = `
+                <div class="text-center mb-4">
+                    <div class="mb-3">
+                        <i class="fas fa-check-circle fa-4x text-success"></i>
+                    </div>
+                    <h4 class="mb-1">Transaction Successful</h4>
+                    <p class="text-muted">The payment has been processed successfully across the network.</p>
+                </div>
+                
+                <div class="card border bg-light">
+                    <div class="card-body p-3">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">User ID:</dt>
+                            <dd class="col-sm-8">${userId}</dd>
+                            
+                            <dt class="col-sm-4">Amount:</dt>
+                            <dd class="col-sm-8">$${parseFloat(amount).toFixed(2)}</dd>
+                            
+                            <dt class="col-sm-4">Timestamp:</dt>
+                            <dd class="col-sm-8">${result.timestamp}</dd>
+                            
+                            <dt class="col-sm-4">Status:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-success">${result.status}</span>
+                            </dd>
+                            
+                            <dt class="col-sm-4">Processing Node:</dt>
+                            <dd class="col-sm-8">${result.server}</dd>
+                        </dl>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Error
+            resultContent.innerHTML = `
+                <div class="text-center mb-4">
+                    <div class="mb-3">
+                        <i class="fas fa-times-circle fa-4x text-danger"></i>
+                    </div>
+                    <h4 class="mb-1">Transaction Failed</h4>
+                    <p class="text-muted">There was a problem processing your transaction.</p>
+                </div>
+                
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${result.detail || "An unknown error occurred."}
+                </div>
+            `;
+        }
+        
+        resultModal.show();
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred: " + error.message);
+    } finally {
+        // Reset button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+});
+</script>
+{% endblock %}

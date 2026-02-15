@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PayChain - Distributed Payment System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #14b8a6;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+        
+        .navbar {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .nav-link {
+            font-weight: 600;
+            color: var(--dark) !important;
+            position: relative;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 1.5rem;
+        }
+        
+        .card-header h5 {
+            margin: 0;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        .node-status {
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .node-status.online {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+        }
+        
+        .node-status.offline {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .page-header {
+            padding: 2rem 0;
+            background-color: white;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i class="fas fa-link text-primary me-2"></i>
+                <span>PayChain</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.url.path == '/' %}active{% endif %}" href="/">
+                            <i class="fas fa-home me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.url.path == '/history' %}active{% endif %}" href="/history">
+                            <i class="fas fa-history me-1"></i> Transactions
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container">
+            <h1 class="h3 mb-0">{% block page_title %}Dashboard{% endblock %}</h1>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        {% block content %}{% endblock %}
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>
+                            <i class="fas fa-network-wired text-primary me-2"></i>
+                            Network Status
+                        </h5>
+                        <button id="refresh-status" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="server-status">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p class="mt-2 text-muted">Checking node status...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white py-4 mt-auto">
+        <div class="container">
+            <div class="row align-items-center justify-content-between">
+                <div class="col-md-6">
+                    <div class="small text-muted">
+                        &copy; 2025 PayChain | Distributed Payment System
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex justify-content-md-end">
+                        <span class="small text-muted me-3">
+                            <i class="fas fa-code me-1"></i> Consensus Algorithm: Raft
+                        </span>
+                        <span class="small text-muted">
+                            <i class="fas fa-clock me-1"></i> Vector Clock Synchronized
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check server status
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('/api/servers');
+                const data = await response.json();
+                
+                const statusDiv = document.getElementById('server-status');
+                let statusHtml = '<div class="row">';
+                
+                data.servers.forEach((server, index) => {
+                    const isHealthy = server.status === 'healthy';
+                    const statusClass = isHealthy ? 'online' : 'offline';
+                    const nodeId = server.address.split(':')[1].replace('5005', '');
+                    
+                    statusHtml += `
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="mb-0">Node ${nodeId}</h6>
+                                        <span class="node-status ${statusClass}">
+                                            ${isHealthy ? 'Online' : 'Offline'}
+                                        </span>
+                                    </div>
+                                    <div class="d-flex align-items-center text-muted small">
+                                        <i class="fas fa-server me-2"></i>
+                                        ${server.address}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                statusHtml += '</div>';
+                statusDiv.innerHTML = statusHtml;
+            } catch (error) {
+                document.getElementById('server-status').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Failed to check node status: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Check status on page load
+        checkServerStatus();
+        
+        // Set up refresh button
+        document.getElementById('refresh-status').addEventListener('click', checkServerStatus);
+        
+        // Refresh status every 30 seconds
+        setInterval(checkServerStatus, 30000);
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

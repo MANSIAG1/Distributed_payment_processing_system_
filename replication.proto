@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package replication;
+
+import "payment.proto"; // Reuse Payment.Transaction
+
+// Request to sync ledger between nodes
+message ReplicationRequest {
+  repeated payment.Transaction transactions = 1;
+  string source_node = 2;
+}
+
+// Response from replication
+message ReplicationResponse {
+  string status = 1;   // "OK" or "FAILED"
+  string message = 2;  // Optional debug message
+}
+
+// Service for ledger replication
+service ReplicationService {
+  rpc ReplicateLedger (ReplicationRequest) returns (ReplicationResponse);
+}

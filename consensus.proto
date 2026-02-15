@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package consensus;
+
+// Vector clock map type
+message VectorClockMap {
+  map<string, int32> clock = 1;
+}
+
+// Request to vote for a leader
+message VoteRequest {
+  int32 term = 1;           // Term number
+  string candidate_id = 2;  // Candidate requesting vote
+  int32 last_log_index = 3; // Index of candidate's last log entry
+  int32 last_log_term = 4;  // Term of candidate's last log entry
+  VectorClockMap vector_clock = 5; // Vector clock of candidate
+}
+
+// Response for vote
+message VoteResponse {
+  bool vote_granted = 1;
+  int32 term = 2;
+  VectorClockMap vector_clock = 3; // Vector clock of voter
+}
+
+// Append log entries (used by leader to replicate logs)
+message AppendEntriesRequest {
+  int32 term = 1;
+  string leader_id = 2;
+  int32 prev_log_index = 3;
+  int32 prev_log_term = 4;
+  repeated LogEntry entries = 5; // New log entries
+  int32 leader_commit = 6;       // Commit index
+  VectorClockMap vector_clock = 7; // Leader's vector clock
+}
+
+// Response for append entries
+message AppendEntriesResponse {
+  int32 term = 1;
+  bool success = 2;
+  VectorClockMap vector_clock = 3; // Follower's vector clock
+}
+
+// Log entry definition
+message LogEntry {
+  string user_id = 1;
+  double amount = 2;
+  string status = 3;
+  string timestamp = 4;
+  VectorClockMap vector_time = 5; // Vector timestamp of the entry
+}
+
+// Consensus service definition
+service ConsensusService {
+  rpc RequestVote (VoteRequest) returns (VoteResponse);
+  rpc AppendEntries (AppendEntriesRequest) returns (AppendEntriesResponse);
+}

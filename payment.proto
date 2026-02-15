@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package payment;
+
+// Request message for a payment
+message PaymentRequest {
+  string user_id = 1;   // The ID of the user making the payment
+  double amount = 2;    // The payment amount
+}
+
+// Response message from the server
+message PaymentResponse {
+  string status = 1;    // "SUCCESS" or "FAILED"
+  string message = 2;   // Additional info (e.g., "Payment processed", "Insufficient funds")
+  string timestamp = 3; // Server timestamp when the transaction was processed
+}
+
+// Request to fetch transaction history
+message HistoryRequest {
+  string user_id = 1;  // User whose history we want
+}
+
+// Response for transaction history
+message HistoryResponse {
+  repeated Transaction transactions = 1;
+}
+
+// A single transaction entry
+message Transaction {
+  string user_id = 1;
+  double amount = 2;
+  string status = 3;
+  string timestamp = 4;
+}
+
+// Payment service definition
+service PaymentService {
+  // Process a new payment
+  rpc ProcessPayment (PaymentRequest) returns (PaymentResponse);
+
+  // Get transaction history for a user
+  rpc GetHistory (HistoryRequest) returns (HistoryResponse);
+}

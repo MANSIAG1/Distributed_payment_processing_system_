@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction Ledger - PayChain{% endblock %}
+
+{% block page_title %}Transaction Ledger{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-search text-primary me-2"></i>
+                    Find Transactions
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="get">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-white">
+                            <i class="fas fa-user text-primary"></i>
+                        </span>
+                        <input type="text" class="form-control" id="user_id" name="user_id" 
+                               value="{{ user_id or '' }}" placeholder="Enter User ID">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-search me-2"></i>
+                            Search
+                        </button>
+                    </div>
+                    <div class="text-center text-muted mt-2">
+                        <small>Search the distributed ledger for all transactions by user ID</small>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if error_message %}
+<div class="alert alert-danger">
+    <div class="d-flex">
+        <div class="me-3">
+            <i class="fas fa-exclamation-circle fa-2x"></i>
+        </div>
+        <div>
+            <h5 class="alert-heading">Error Occurred</h5>
+            <p class="mb-0">{{ error_message }}</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if user_id %}
+    {% if transactions %}
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>
+                <i class="fas fa-list-alt text-primary me-2"></i>
+                Ledger Records
+            </h5>
+            <span class="badge bg-primary">{{ transactions|length }} Transactions</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="ps-3">#</th>
+                            <th scope="col">User ID</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Timestamp</th>
+                            <th scope="col">Processing Node</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td class="ps-3">{{ loop.index }}</td>
+                            <td>
+                                <span class="fw-semibold">{{ transaction.user_id }}</span>
+                            </td>
+                            <td>
+                                <span class="text-success fw-semibold">${{ "%.2f"|format(transaction.amount) }}</span>
+                            </td>
+                            <td>
+                                <span class="badge {% if transaction.status == 'COMMITTED' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ transaction.status }}
+                                </span>
+                            </td>
+                            <td>{{ transaction.timestamp }}</td>
+                            <td>
+                                <span class="badge bg-primary bg-opacity-10 text-primary">
+                                    {% if transaction.node_id %}Node {{ transaction.node_id }}{% else %}Unknown{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center">
+        <a href="/" class="btn btn-outline-primary">
+            <i class="fas fa-plus-circle me-1"></i>
+            New Transaction
+        </a>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body p-5 text-center">
+            <div class="mb-4">
+                <i class="fas fa-search fa-3x text-muted opacity-50"></i>
+            </div>
+            <h4 class="mb-2">No Transactions Found</h4>
+            <p class="text-muted mb-4">No transaction records found for user: <strong>{{ user_id }}</strong></p>
+            <a href="/" class="btn btn-primary btn-lg px-4">
+                <i class="fas fa-plus-circle me-2"></i>
+                Process New Transaction
+            </a>
+        </div>
+    </div>
+    {% endif %}
+{% else %}
+<div class="card">
+    <div class="card-body p-5 text-center">
+        <div class="mb-4">
+            <i class="fas fa-database fa-3x text-muted opacity-50"></i>
+        </div>
+        <h4 class="mb-2">Distributed Ledger</h4>
+        <p class="text-muted col-lg-8 mx-auto mb-4">
+            The transaction ledger is synchronized across all nodes in the network using a Raft consensus protocol and vector clocks for causality tracking.
+            Enter a user ID in the search field above to view their complete transaction history.
+        </p>
+    </div>
+</div>
+{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
